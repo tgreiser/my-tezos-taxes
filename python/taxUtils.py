@@ -1,4 +1,5 @@
 import json
+from multiprocessing import pool
 import requests
 import numpy as np
 import pandas as pd
@@ -44,6 +45,12 @@ TOKENS = {
     "Rarible token": "KT18pVpRXKPY2c4U2yFEGSH3ZnhB2kL8kwXS",
     "Les Elefants Terribles token": "KT19BLv8px4VMLduVnYgahqFbsJ19FJXamUG",
     "The Moments token": "KT1CNHwTyjFrKnCstRoMftyFVwoNzF6Xxhpy",
+    "crDAO": "KT1XPFjZqCULSnqfKaaYy8hJjeY63UNSGwXg",
+    "CRUNCH": "",
+    "fDAO": "",
+    "FLAME": "",
+    "GSAL": "",
+    "GUTS": "",
     "wUSDC": "KT18fp5rcTW7mbWDmzFwjLDUhs5MeJmagDSZ",
     "uUSD": "KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW"
 }
@@ -142,12 +149,102 @@ SMART_CONTRACTS = {
     "TezID Store": "KT1RaNxxgmVRXpyu927rbBFq835pnQk6cfvM",
     "TezID Controller": "KT1KbV8dBrkFopgjcCc4qb2336fcGgTvRGRC",
     "Ukraine war donations contract": "KT1DWnLiUkNtAQDErXxudFEH63JC6mqg3HEx",
+    "QuipuSwap crDAO": "KT1FHiJmJUgZMPtv5F8M4ZEa6cb1D9Lf758T",
+    "QuipuSwap CRUNCH": "KT1RRgK6eXvCWCiEGWhRZCSVGzhDzwXEEjS4",
+    "QuipuSwap fDAO": "KT1BweorZK1CJDEu76SyKcxfzeiAxip73Kot",
+    "QuipuSwap FLAME": "KT1Q93ftAUzvfMGPwC78nX8eouL1VzmHPd4d",
+    "QuipuSwap GSAL": "KT1BzNUUjURkTtNhXFkbGtu9fY3Q5scKZrvK",
+    "QuipuSwap GUTS": "KT1GaR1CmFoTTjqRwYSE8WdpBuxuviKGbcqs",
     "QuipuSwap hDAO old": "KT1Qm3urGqkRsWsovGzNb2R81c3dSfxpteHG",
+    "QuipuSwap HEH": "KT1BgezWwHBxA9NrczwK9x3zfgFnUkc7JJ4b",
+    "QuipuSwap HERA": "KT1DgbAE84xno2wdaEgeYpZkFZMs5fskAgP7",
     "QuipuSwap hDAO": "KT1QxLqukyfohPV5kPkw97Rs6cw1DDDvYgbB",
+    "QuipuSwap hrDAO": "KT1PiXcVdqgsaYnkQ7KAec9skLRMtmDcsnMy",
+    "QuipuSwap kDAO": "KT1NEa7CmaLaWgHNi6LkRi5Z1f4oHfdzRdGA",
+    "QuipuSwap kUSD": "KT1K4EwTpbvYN9agJdjpyJm4ZZdhpUNKB3F6",
+    "QuipuSwap PAUL": "KT1K8A8DLUTVuHaDBCZiG6AJdvKJbtH8dqmN",
+    "QuipuSwap PLENTY": "KT1X1LgNkQShpF9nRLYw3Dgdy4qp38MX617z",
+    "QuipuSwap PURPLE": "KT1CgUDhiEQute6BxcgeSbZj3FiG2ZbdQC6B",
+    "QuipuSwap QUIPU": "KT1X3zxdTzPB9DgVzA3ad6dgZe9JEamoaeRy",
+    "QuipuSwap REGI": "KT1SpB8Jk6GPCWUjMod8Q5NDpfagQaXVSpNk",
+    "QuipuSwap RCKT": "KT1B7NqoQQkALYPS9fdxrcjGMQST6Wv4yy3h",
+    "QuipuSwap sDAO": "KT1PrRTVNgxkRgyqqNQvwTiVhd55dqyxXJ6n",
+    "QuipuSwap SHR": "KT1EMkmDUTy623xQRwR3Q2ZNCXK6mCmBadak",
+    "QuipuSwap SEB": "KT1S4WyNiYPoYheihysddNh5hojNFdiVBwZL",
+    "QuipuSwap SPI": "KT1Eg2QesN1tCzScTrvoeKm5W67GgjV32McR",
+    "QuipuSwap STKR": "KT1BMEEPX7MWzwwadW3NCSZe9XGmFJ7rs7Dr",
+    "QuipuSwap TZD": "KT1ERmjYo3hotAFmegVCJ2EAgUmc7RtXyV87",
+    "QuipuSwap WRAP": "KT1FG63hhFtMEEEtmBSX2vuFmP87t9E7Ab4t",
+    "QuipuSwap WTZ": "KT1W3VGRUjvS869r4ror8kdaxqJAZUbPyjMT",
+    "QuipuSwap wAAVE": "KT1Lvtxpg4MiT2Bs38XGxwh3LGi5MkCENp4v",
+    "QuipuSwap wBUSD": "KT1UMAE2PBskeQayP5f2ZbGiVYF7h8bZ2gyp",
+    "QuipuSwap wCOMP": "KT1DA8NH6UqCiSZhEg5KboxosMqLghwwvmTe",
+    "QuipuSwap wDAI": "KT1PQ8TMzGMfViRq4tCMFKD2QF5zwJnY67Xn",
+    "QuipuSwap wHT": "KT1GsTjbWkTgtsWenM6oWuTuft3Qb46p2x4c",
+    "QuipuSwap wHUSD": "KT1AN7BBmeSUN5eDDQLEhWmXv1gn4exc5k8R",
+    "QuipuSwap wLINK": "KT1Lpysr4nzcFegC9ci9kjoqVidwoanEmJWt",
+    "QuipuSwap wMATIC": "KT1RsfuBee5o7GtYrdB7bzQ1M6oVgyBnxY4S",
+    "QuipuSwap wPAX": "KT1Ca5FGSeFLH3ugstc5p56gJDMPeraBcDqE",
+    "QuipuSwap wSUSHI": "KT1Lotcahh85kp878JCEc1TjetZ2EgqB24vA",
+    "QuipuSwap wUNI": "KT1Ti3nJT85vNn81Dy5VyNzgufkAorUoZ96q",
     "QuipuSwap wUSDC": "KT1U2hs5eNdeCpHouAvQXGMzGFGJowbhjqmo",
-    "QuipuSwap uUSD": "KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di"
+    "QuipuSwap wUSDT": "KT1T4pfr6NL8dUiz8ibesjEvH2Ne3k6AuXgn",
+    "QuipuSwap uUSD": "KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di",
+    "QuipuSwap wWBTC": "KT1DksKXvCBJN7Mw6frGj6y6F3CbABWZVpj1",
+    "QuipuSwap wWETH": "KT1DuYujxrmgepwSDHtADthhKBje9BosUs1w",
+    "SiriusDEX": "KT1TxqZ8QtKvLu3V3JH7Gx58n7Co8pgtpQU5",
+    "The Descendants": "KT1DXUyCM6TW3cQyRkBAk8GeUgZmmknhtERM"
 }
 
+def lookup_token_from_quipu_pool(pool_address, with_metadata = False, alias = None):
+    """Lookup the token address from a Quipu pool address
+    
+    Parameters
+    ----------
+    pool_address : str
+        The address of the Quipu pool
+    with_metadata : bool
+        Whether to return the metadata of the token
+    alias : str, optional
+        The alias of the pool contract, by default None
+    
+    Returns
+    -------
+    object { 'contract': str, 'address': str, 'token_id': int }
+    """
+    url = "https://api.tzkt.io/v1/contracts/%s/storage" % pool_address
+    r = requests.get(url)
+    pay = r.json()
+    #print(pay)
+    token_id = pay['storage']['token_id'] if 'token_id' in pay['storage'] else 0
+    token = { 'contract': alias if alias else pool_address, 'address': pay['storage']['token_address'], 'token_id': token_id }
+
+    if with_metadata:
+        token = lookup_token_metadata(token)
+
+    return token
+
+def lookup_token_metadata(token):
+    """Lookup the token metadata from a token address
+
+    Parameters
+    ----------
+    token : object { 'contract': str, 'address': str, 'token_id': int }
+        The token object
+    token_id : int
+        The id of the token
+
+    Returns
+    -------
+    object metadata
+    """
+    url = "https://api.tzkt.io/v1/tokens?contract.eq=%s&tokenId.eq=%s" % (token['address'], token['token_id'])
+    r = requests.get(url)
+    pay = r.json()
+    #print(pay)
+    token['symbol'] = pay[0]['metadata']['symbol']
+    token['decimals'] = pay[0]['metadata']['decimals']
+    return token
 
 def read_json_file(file_name):
     """Reads a json file from disk.
@@ -383,7 +480,7 @@ def get_fa12_tokens():
 
 def get_fa2_tokens():
     """Returns the complete list of tezos FA2 tokens.
-
+    NOTE - this function only returns tokens with tokenId = 0.
     Returns
     -------
     list
@@ -1912,3 +2009,40 @@ def get_tez_exchange_gains(operations, hold_period):
         "taxed_gain_usd": taxed_gain_usd})
 
     return tez_exchange_gains
+
+def get_koinly_csv(operations, wallet):
+    """Returns a pandas data frame with the Koinly CSV format.
+
+    Parameters
+    ----------
+    operations: object
+        The pandas data frame with the user operations.
+    wallet: string
+        The wallet hash
+
+    Returns
+    -------
+    object
+        A pandas data frame with the Koinly CSV format.
+
+    """
+
+    targets = operations.loc[operations['target'] == 'tz1cTS1WwovU7SC783xgJxZrzr151mcshmNi']
+    senders = operations.loc[operations['sender'] == 'tz1cTS1WwovU7SC783xgJxZrzr151mcshmNi']
+    main = pd.concat([targets, senders])
+
+    # Create the data frame
+    koinly_csv = pd.DataFrame({
+        "Date": main["timestamp"],
+        "Type": main["type"],
+        "Currency": main["currency"],
+        "Amount": main["amount"],
+        "Fees": main["fees"],
+        "To Address": main["to_address"],
+        "From Address": main["from_address"],
+        "Transaction Hash": main["transaction_hash"],
+        "Transaction Link": main["transaction_link"],
+        "Notes": main["notes"],
+        "Wallet": main})
+
+    return koinly_csv

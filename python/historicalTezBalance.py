@@ -6,7 +6,7 @@ from taxUtils import *
 data_directory = "../data"
 
 # Load the user wallets
-user_wallets = read_json_file(os.path.join(data_directory, "input", "user_wallets.json"))
+user_wallets = read_json_file(os.path.join(data_directory, "account_main", "user_wallets.json"))
 user_first_wallet = list(user_wallets.keys())[0]
 
 # Get the combined tez balance from all the user wallets

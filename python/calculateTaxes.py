@@ -6,7 +6,7 @@ from taxUtils import *
 data_directory = "../data"
 
 # Load the user wallets
-user_wallets = read_json_file(os.path.join(data_directory, "input", "user_wallets.json"))
+user_wallets = read_json_file(os.path.join(data_directory, "account_main", "user_wallets.json"))
 user_first_wallet = list(user_wallets.keys())[0]
 
 # Load the csv file containing all the user operations
@@ -37,7 +37,7 @@ sold_tokens = sold_tokens.astype({"token_id": str})
 transferred_tokens = transferred_tokens.astype({"token_id": str})
 
 # Load the tax parameters provided by the user
-tax_parameters = read_json_file(os.path.join(data_directory, "input", "tax_parameters.json"))
+tax_parameters = read_json_file(os.path.join(data_directory, "account_main", "tax_parameters.json"))
 start_date = pd.to_datetime(tax_parameters["start_date"])
 end_date = pd.to_datetime(tax_parameters["end_date"])
 hold_period = 365 * tax_parameters["hold_period_in_years"]
