@@ -816,6 +816,16 @@ def get_transaction_aliases(transaction, token_aliases, user_wallets, burn_addre
         transaction["token_id"] = tok['token_id']
         transaction["token_address"] = tok['address']
 
+    # need to catch the receive tez suboperations that are part of a swap
+    if transaction["kind"] == "receive tez":
+        tok = _tokens.get(transaction["sender"])
+        if tok != None:
+            transaction['kind'] = "sell %s in QuipuSwap" % tok['symbol']
+            transaction['collection_sale'] = True
+            transaction['token_id'] = tok['token_id']
+            transaction['token_address'] = tok['address']
+
+
     if transaction["entrypoint"] == "accept_invitation":
         if transaction["target"] == SMART_CONTRACTS["objkt.com Minting Factory"]:
             transaction["kind"] = "accept objkt.com invitation"

@@ -215,6 +215,8 @@ def lookup_token_from_quipu_pool(pool_address, with_metadata = False, alias = No
     url = "https://api.tzkt.io/v1/contracts/%s/storage" % pool_address
     r = requests.get(url)
     pay = r.json()
+    if 'storage' not in pay:
+        return None
     #print(pay)
     token_id = pay['storage']['token_id'] if 'token_id' in pay['storage'] else 0
     token = { 'contract': alias if alias else pool_address, 'address': pay['storage']['token_address'], 'token_id': token_id }
@@ -1829,6 +1831,8 @@ def get_token_trades(collected_tokens, dropped_tokens, sold_tokens, transferred_
             incoming_tokens["token_id"] == token["token_id"]) & (
             incoming_tokens["token_address"] == token["token_address"]) & (
             incoming_tokens["token_editions"] > 0)
+
+        print("Token %s count %d" % (token['token_name'], cond.sum()))
 
         if cond.sum() > 0:
             # Loop over the owned editions and calculate the combined buy price
