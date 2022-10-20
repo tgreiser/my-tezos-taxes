@@ -30,6 +30,10 @@ burn_addresses = ["tz1burnburnburnburnburnburnburjAYjjX"]
 token_transfers = []
 
 for tt in raw_token_transfers:
+    amount = int(tt['amount'])
+    if 'token' in tt and 'metadata' in tt['token']:
+        digits = int(tt['token']['metadata']['decimals'])
+        amount = float(tt['amount']) / 10 ** digits
     # Save the most relevant information
     token_transfer = {
         "timestamp": tt["timestamp"],
@@ -42,7 +46,7 @@ for tt in raw_token_transfers:
         "receive": False,
         "burn": False,
         "token_id": tt["token"]["tokenId"],
-        "token_editions": int(tt["amount"]),
+        "token_editions": amount,
         "token_address": tt["token"]["contract"]["address"],
         "token_standard": tt["token"]["standard"]}
 

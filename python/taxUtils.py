@@ -1832,8 +1832,6 @@ def get_token_trades(collected_tokens, dropped_tokens, sold_tokens, transferred_
             incoming_tokens["token_address"] == token["token_address"]) & (
             incoming_tokens["token_editions"] > 0)
 
-        print("Token %s count %d" % (token['token_name'], cond.sum()))
-
         if cond.sum() > 0:
             # Loop over the owned editions and calculate the combined buy price
             indices = incoming_tokens.index[cond]
